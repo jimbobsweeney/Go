@@ -71,12 +71,19 @@ class group_tests(class_tests):
     def test_am_i_alive(self):
         self.testboard = gologic.board(13)
         self.testgroup = gologic.group(3,3,0)
-        assert self.testgroup.am_i_alive(self.testboard.grid) == True
+        assert self.testgroup.am_i_alive(self.testboard.grid) == True, "group should have more than 0 liberties"
         
         self.testgroup2 = gologic.group(0,0,0)
         self.testboard.grid[1][0] = gologic.stone(1,2)
         self.testboard.grid[0][1] = gologic.stone(1,3)
-        assert self.testgroup2.am_i_alive(self.testboard.grid) == False
+        assert self.testgroup2.am_i_alive(self.testboard.grid) == False, "group should have 0 liberties"
+        
+        self.testgroup3 = gologic.group(10,10,0)
+        self.testboard.grid[11][10] = gologic.stone(1,2)
+        self.testboard.grid[9][10] = gologic.stone(1,3)
+        self.testboard.grid[10][11] = gologic.stone(1,4)
+        self.testboard.grid[10][9] = gologic.stone(1,5)
+        assert self.testgroup3.am_i_alive(self.testboard.grid) == False, "group should have 0 liberties"
 
 if __name__ == "__main__":
     unittest.main()    
