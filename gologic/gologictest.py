@@ -10,7 +10,78 @@ import gologic
 #test for my classes
 class class_tests(unittest.TestCase):pass
 
-
+#test my game class
+class game_tests(class_tests):
+    
+    #test game constructor
+    def test_new_game(self):
+        self.testgame = gologic.game(13)
+        assert self.testgame.gameboard.grid[(12,12)] == None
+        with self.assertRaises(KeyError):
+            print (self.testgame.gameboard.grid[(13,0)])
+        with self.assertRaises(KeyError):
+            print (self.testgame.gameboard.grid[(-1,0)])
+        assert self.testgame.groups == []
+        self.testgame.score[1] = 10
+    
+    #test the check for adjacent groups to a proposed move function 
+    def test_check_for_group(self):
+        self.testgame = gologic.game(19)
+        self.testgame.groups.append(gologic.group((5,5),0)) 
+        self.testmove = gologic.move((4,5),0)
+        self.testgame.check_for_group(self.testmove)
+        assert len(self.testmove.adjacent_groups) == 1,"There should be one adjacent group to this move"
+        
+    #test the check for adjacent groups to a proposed move function 
+    def test_check_for_group_2(self):
+        self.testgame = gologic.game(19)
+        self.testgame.groups.append(gologic.group((5,5),0)) 
+        self.testgame.groups.append(gologic.group((3,5),0)) 
+        self.testgame.groups.append(gologic.group((4,6),0)) 
+        self.testgame.groups.append(gologic.group((4,4),0))
+        self.testmove = gologic.move((4,5),0) 
+        self.testgame.check_for_group(self.testmove)
+        assert len(self.testmove.adjacent_groups) == 4,"There should be 4 adjacent groups to this move"
+      
+    #test the check for adjacent groups to a proposed move function 
+    def test_check_for_group_3(self):
+        self.testgame = gologic.game(19)
+        self.testgame.groups.append(gologic.group((5,5),0))
+        self.testgame.groups[0].add_position((4,4))
+        self.testgame.groups[0].add_position((5,4))
+        self.testgame.groups[0].add_position((3,4))
+        self.testgame.groups[0].add_position((3,5))      
+        self.testmove = gologic.move((4,5),0)
+        self.testgame.check_for_group(self.testmove)
+        assert len(self.testmove.adjacent_groups) == 1,"There should be one adjacent group to this move"  
+  
+    #test the check for adjacent groups to a proposed move function 
+    def test_check_for_group_4(self):
+        self.testgame = gologic.game(19)
+        self.testgame.groups.append(gologic.group((5,5),0))
+        self.testgame.groups[0].add_position((4,4))
+        self.testgame.groups[0].add_position((5,4))
+        self.testgame.groups.append(gologic.group((3,4),0))
+        self.testgame.groups[1].add_position((3,5)) 
+        self.testgame.groups.append(gologic.group((4,6),0))     
+        self.testmove = gologic.move((4,5),0)
+        self.testgame.check_for_group(self.testmove)
+        assert len(self.testmove.adjacent_groups) == 3,"There should be 3 adjacent groups to this move" 
+ 
+    #test the merge group function
+    def test_merge_group(self):
+        self.testgame = gologic.game(30)
+        self.testgame.groups.append(gologic.group((5,5),0))
+        self.testgame.groups[0].add_position((4,4))
+        self.testgame.groups[0].add_position((5,4))
+        self.testgame.groups.append(gologic.group((3,4),0))
+        self.testgame.groups[1].add_position((3,5)) 
+        self.testgame.groups.append(gologic.group((4,6),0))
+        self.testmergelist = [self.testgame.groups[0],self.testgame.groups[1],self.testgame.groups[2]]
+        self.testgame.merge_groups(self.testmergelist)
+        assert len(self.testgame.groups) == 1,"Should only be one group after this merge"
+        
+        
 #test my board class
 class board_tests(class_tests):
     
@@ -87,6 +158,27 @@ class group_tests(class_tests):
         self.testboard.grid[(10,9)] = gologic.stone(1,5)
         assert self.testgroup3.am_i_alive(self.testboard.grid) == False, "group should have 0 liberties"
  
+    #test am_i_alive function    
+    def test_am_i_alive2(self):
+        self.testgame = gologic.game(9)
+        self.testgame.groups.append(gologic.group((5,5),0))
+        self.testgame.groups[0].add_position((4,4))
+        assert self.testgame.groups[0].am_i_alive(self.testgame.gameboard.grid) == True, "group should have more than 0 liberties"
+ 
+    #test am_i_alive function    
+    def test_am_i_alive3(self):
+        self.testgame = gologic.game(9)
+        self.testgame.groups.append(gologic.group((4,5),0))
+        self.testgame.groups[0].add_position((4,4))
+        self.testgame.gameboard.add_stone((4,4),0,15)
+        self.testgame.gameboard.add_stone((4,5),0,16)
+        self.testgame.gameboard.add_stone((4,3),1,17)
+        self.testgame.gameboard.add_stone((4,6),1,18)
+        self.testgame.gameboard.add_stone((3,4),1,19)
+        self.testgame.gameboard.add_stone((3,5),1,20)
+        self.testgame.gameboard.add_stone((5,4),1,21)
+        self.testgame.gameboard.add_stone((5,5),1,22)
+        assert self.testgame.groups[0].am_i_alive(self.testgame.gameboard.grid) == False, "group should have 0 liberties"
  
 #test my move class
 class move_tests(class_tests):
@@ -94,8 +186,9 @@ class move_tests(class_tests):
     #test new move instantiation    
     def test_new_move(self):
         self.testmove = gologic.move((5,5),0)
-        assert self.testmove == None
-        assert self.testmove == None
+        assert self.testmove.position == (5,5)
+        assert self.testmove.colour == 0
+        assert self.testmove.adjacent_groups == []
 
 
 if __name__ == "__main__":

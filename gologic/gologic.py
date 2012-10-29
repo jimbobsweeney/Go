@@ -10,7 +10,7 @@ class bad_stone_order_error(go_logic_error): pass
 class position_xy_out_of_range_error(go_logic_error): pass
 class position_occupied_error(go_logic_error): pass
 
-#function to return von neumann neighbourhood of a position
+"""function to return von neumann neighbourhood of a position"""
 def get_von_neumann(position):
     x = position[0]
     y = position[1]
@@ -19,21 +19,39 @@ def get_von_neumann(position):
 
 class game():
     def __init__(self,size):
+        self.score = {}
         self.gameboard = board(size)
         self.groups = []
         
-    """Check for adjacent groups when placing a stone"""
+    """Check for adjacent groups when placing a stone,
+    if one stone from a same coloured group is found in a neighbouring square then that group is adjacent
+    and it is added to the adjacent list and the function ignores that group from then on in its search,
+    also if the function finds a match while iterating through stones in a group it breaks
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!Note to self: might be better if stones knew what group they were in"""
+    
     def check_for_group(self,move):
-        for i in get_von_neumann(move.position): #iterate through von neumann neighbourhood of proposed stone placement position
+        for movepos in get_von_neumann(move.position): #iterate through von neumann neighbourhood of proposed stone placement position
             for group in self.groups: #iterate through all groups
-                is_adjacent = False
-                for position in group.positions: #iterate through all positions in each group
-                    while is_adjacent == False:
-                        if move.colour == group.colour and x == postition[0] and y == position[1]:
-                            move.adjacent_groups.append(group)
-                            is_adjacent = True 
-        
-        
+                if move.colour == group.colour:
+                    if group not in move.adjacent_groups:
+                        for position in group.positions: #iterate through all positions in each group
+                            if movepos[0] == position[0] and movepos[1] == position[1]:
+                                move.adjacent_groups.append(group)
+                                break
+    
+    def merge_groups(self,groups): 
+        first = True
+        for group in groups:
+            if first == True:
+                mergegroup = group
+                first = False
+            else:
+                mergegroup.positions = mergegroup.positions + group.positions
+                #del self.groups[self.groups.index(group)]
+                self.groups.remove(group)
+    
+    
 class move():
     def __init__(self,position,colour):
         self.position = position
@@ -83,8 +101,8 @@ class group():
                             return True
         return False
 
-    def addposition(self):
-        pass
+    def add_position(self,position):
+        self.positions.append(position)
     
     def die(self):
         pass
@@ -92,8 +110,10 @@ class group():
 
 if __name__ == '__main__':
     testboard = board(13)
+    """
     testboard.grid[(1,0)]= stone(0,0)
     testboard.grid[(0,1)]= stone(0,0)
     testgroup = group((0,0),0)
     print testgroup.am_i_alive(testboard.grid)
+    """
     pass
