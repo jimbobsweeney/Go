@@ -3,7 +3,7 @@ Created on 26 Oct 2012
 
 @author: BAM
 '''
-#Set up exceptions
+"""Set up exceptions"""
 class go_logic_error(Exception): pass
 class bad_board_size_error(go_logic_error): pass
 class bad_stone_order_error(go_logic_error): pass
@@ -19,7 +19,7 @@ def get_von_neumann(position):
 
 class game():
     def __init__(self,size):
-        self.score = {}
+        self.dead_stones = [0,0]
         self.gameboard = board(size)
         self.groups = []
         
@@ -48,8 +48,15 @@ class game():
                 first = False
             else:
                 mergegroup.positions = mergegroup.positions + group.positions
-                #del self.groups[self.groups.index(group)]
                 self.groups.remove(group)
+    
+    def kill_group(self,group):
+        score = 0
+        for position in group.positions:
+            score = score + 1
+            self.gameboard.grid[position] = None
+        self.groups.remove(group)
+        self.dead_stones[group.colour] = self.dead_stones[group.colour] + score
     
     
 class move():
@@ -104,13 +111,10 @@ class group():
     def add_position(self,position):
         self.positions.append(position)
     
-    def die(self):
-        pass
-
 
 if __name__ == '__main__':
-    testboard = board(13)
     """
+    testboard = board(13)
     testboard.grid[(1,0)]= stone(0,0)
     testboard.grid[(0,1)]= stone(0,0)
     testgroup = group((0,0),0)

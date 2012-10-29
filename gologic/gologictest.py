@@ -22,7 +22,7 @@ class game_tests(class_tests):
         with self.assertRaises(KeyError):
             print (self.testgame.gameboard.grid[(-1,0)])
         assert self.testgame.groups == []
-        self.testgame.score[1] = 10
+        self.testgame.dead_stones[1] = 10
     
     #test the check for adjacent groups to a proposed move function 
     def test_check_for_group(self):
@@ -81,6 +81,21 @@ class game_tests(class_tests):
         self.testgame.merge_groups(self.testmergelist)
         assert len(self.testgame.groups) == 1,"Should only be one group after this merge"
         
+    #test the kill group function
+    def test_kill_group(self):
+        self.testgame = gologic.game(19)
+        self.testgame.gameboard.add_stone((5,5),1,15)
+        self.testgame.gameboard.add_stone((4,4),1,15)
+        self.testgame.gameboard.add_stone((5,4),1,15)
+        self.testgame.groups.append(gologic.group((5,5),1))
+        self.testgame.groups[0].add_position((4,4))
+        self.testgame.groups[0].add_position((5,4))
+        assert len(self.testgame.groups) == 1,"There should be 1 group"
+        print self.testgame.dead_stones[0]
+        self.testgame.kill_group(self.testgame.groups[0])
+        assert len(self.testgame.groups) == 0,"There should be 0 groups after killing group"
+        for position, value in self.testgame.gameboard.grid.items():
+            assert value == None,"Board should be empty"
         
 #test my board class
 class board_tests(class_tests):
