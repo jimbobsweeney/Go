@@ -3,6 +3,9 @@ Created on 26 Oct 2012
 
 @author: BAM
 '''
+
+import copy
+
 """Set up exceptions"""
 class go_logic_error(Exception): pass
 class bad_board_size_error(go_logic_error): pass
@@ -19,6 +22,7 @@ def get_von_neumann(position):
 
 class game():
     def __init__(self,size):
+        self.order = 1
         self.dead_stones = [0,0]
         self.gameboard = board(size)
         self.groups = []
@@ -33,11 +37,14 @@ class game():
     def check_for_group(self,move):
         for movepos in get_von_neumann(move.position): #iterate through von neumann neighbourhood of proposed stone placement position
             for group in self.groups: #iterate through all groups
-                if move.colour == group.colour:
-                    if group not in move.adjacent_groups:
-                        for position in group.positions: #iterate through all positions in each group
-                            if movepos[0] == position[0] and movepos[1] == position[1]:
+                if group not in move.adjacent_groups and group not in move.adjacent_op_groups:
+                    for position in group.positions: #iterate through all positions in each group
+                        if movepos[0] == position[0] and movepos[1] == position[1]:
+                            if move.colour == group.colour:
                                 move.adjacent_groups.append(group)
+                                break
+                            else:
+                                move.adjacent_op_groups.append(group)
                                 break
     
     def merge_groups(self,groups): 
@@ -58,12 +65,28 @@ class game():
         self.groups.remove(group)
         self.dead_stones[group.colour] = self.dead_stones[group.colour] + score
     
+    """High lvl function to make a move. First the move is simulated on a copy of the game"""
+    def make_a_move(self,move):
+        sim_game = copy.deepcopy(self)
+        sim_game.check_for_group(move)
+        if len(move.adjacent_groups) > 0:
+            sim_game.merge_groups(move.adjacent_groups)
+            #sim_game.groups[move]
+                
+        else: 
+            sim_game.groups.append(group(move.position,move.colour))
+            
+        sim_game.gameboard.add_stone(move.position,move.colour,sim_game.order)
+        sim_game.order = sim_game.order + 1
+        for group in sim_game.groups: group.am_i_alive(sim_game.gameboard.grid)
+    
     
 class move():
     def __init__(self,position,colour):
         self.position = position
         self.colour = colour
         self.adjacent_groups = []
+        self.adjacent_op_groups = []
                 
 """Board class contins 2d list of positions"""
 class board():
@@ -90,6 +113,7 @@ class stone():
             raise bad_stone_order_error,'Stone order cannot be less than 0'
         self.colour = colour
         self.order = order
+        self.my_group = None
 
   
 class group():

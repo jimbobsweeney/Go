@@ -31,6 +31,9 @@ class game_tests(class_tests):
         self.testmove = gologic.move((4,5),0)
         self.testgame.check_for_group(self.testmove)
         assert len(self.testmove.adjacent_groups) == 1,"There should be one adjacent group to this move"
+        self.testgame.groups.append(gologic.group((3,5),1))
+        self.testgame.check_for_group(self.testmove)
+        assert len(self.testmove.adjacent_op_groups) == 1,"There should be one adjacent opponent group to this move" 
         
     #test the check for adjacent groups to a proposed move function 
     def test_check_for_group_2(self):
@@ -96,6 +99,15 @@ class game_tests(class_tests):
         assert len(self.testgame.groups) == 0,"There should be 0 groups after killing group"
         for position, value in self.testgame.gameboard.grid.items():
             assert value == None,"Board should be empty"
+        
+    #test make a move function
+    def test_make_a_move(self):
+        self.testgame = gologic.game(19)
+        self.testmove = gologic.move((5,5),0)
+        self.testgame.make_a_move(self.testmove)
+        assert len(self.testgame.groups) == 1,"There should be 1 group"
+        #assert self.testgame.gameboard.grid == 1,"There should be 1 group"
+        
         
 #test my board class
 class board_tests(class_tests):
