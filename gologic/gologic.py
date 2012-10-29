@@ -27,25 +27,18 @@ class game():
         self.gameboard = board(size)
         self.groups = []
         
-    """Check for adjacent groups when placing a stone,
-    if one stone from a same coloured group is found in a neighbouring square then that group is adjacent
-    and it is added to the adjacent list and the function ignores that group from then on in its search,
-    also if the function finds a match while iterating through stones in a group it breaks
-    
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!Note to self: might be better if stones knew what group they were in"""
-    
+    """Check for adjacent groups when placing a stone, Stones know which group they are in so this function is now very efficient
+    Only the Von Neumann neoghbourhood of a move is checked to find which groups will be affected by the move
+    There is a maximum of only four iterations and any irrelevant groups or positions in a group are not considered"""
     def check_for_group(self,move):
         for movepos in get_von_neumann(move.position): #iterate through von neumann neighbourhood of proposed stone placement position
-            for group in self.groups: #iterate through all groups
+            if self.gameboard.grid[(movepos)] != None:
+                group = self.gameboard.grid[(movepos)].my_group
                 if group not in move.adjacent_groups and group not in move.adjacent_op_groups:
-                    for position in group.positions: #iterate through all positions in each group
-                        if movepos[0] == position[0] and movepos[1] == position[1]:
-                            if move.colour == group.colour:
-                                move.adjacent_groups.append(group)
-                                break
-                            else:
-                                move.adjacent_op_groups.append(group)
-                                break
+                    if move.colour == group.colour:
+                        move.adjacent_groups.append(group)
+                    else:
+                        move.adjacent_op_groups.append(group)
     
     def merge_groups(self,groups): 
         first = True
@@ -54,7 +47,8 @@ class game():
                 mergegroup = group
                 first = False
             else:
-                mergegroup.positions = mergegroup.positions + group.positions
+                for position in group.positions:
+                    mergegroup.add_position(position,self.gameboard.grid)
                 self.groups.remove(group)
     
     def kill_group(self,group):
@@ -117,9 +111,10 @@ class stone():
 
   
 class group():
-    def __init__(self,position,colour):
+    def __init__(self,position,colour,grid):
         self.colour = colour
         self.positions = [position]
+        grid[position].my_group = self
      
     """function to check if group is alive, if it finds one liberty it stops looking 
     if it completes the loop without finding any then the group is dead 
@@ -132,9 +127,9 @@ class group():
                             return True
         return False
 
-    def add_position(self,position):
+    def add_position(self,position,grid):
         self.positions.append(position)
-    
+        grid[position].my_group = self
 
 if __name__ == '__main__':
     """
