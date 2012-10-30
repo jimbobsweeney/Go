@@ -10,6 +10,32 @@ import gologic
 #test for my classes
 class class_tests(unittest.TestCase):pass
 
+
+#test my interface class
+class interface_tests(class_tests):
+    
+    #play test game
+    def test_gameplay(self):
+        test_interface = gologic.interface()
+        test_interface.newgame(13)
+        test_interface.try_move((2,2))#black
+        test_interface.try_move((2,1))#white
+        test_interface.try_move((2,3))#black
+        assert len(test_interface.game.groups) == 2,"should be 2 groups now"
+        test_interface.try_move((2,0))#white
+        assert len(test_interface.game.groups) == 2,"should be 2 groups now"
+        test_interface.try_move((1,1))#black
+        assert len(test_interface.game.groups) == 3,"should be 3 groups now"
+        test_interface.pass_turn()
+        test_interface.try_move((1,0))
+        test_interface.pass_turn()
+        test_interface.try_move((3,1))
+        test_interface.pass_turn()
+        test_interface.try_move((3,0))
+        assert len(test_interface.game.groups) == 3,"should be 3 groups now"
+        assert len(test_interface.game.groups) == 3,"should be 3 groups now"
+        
+     
 #test my game class
 class game_tests(class_tests):
     
@@ -119,11 +145,11 @@ class game_tests(class_tests):
         self.testgame.groups[0].add_position((4,4),self.testgame.gameboard.grid)
         self.testgame.groups[0].add_position((5,4),self.testgame.gameboard.grid)
         assert len(self.testgame.groups) == 1,"There should be 1 group"
-        print self.testgame.dead_stones[0]
         self.testgame.kill_group(self.testgame.groups[0])
         assert len(self.testgame.groups) == 0,"There should be 0 groups after killing group"
         for position, value in self.testgame.gameboard.grid.items():
             assert value == None,"Board should be empty"
+        assert self.testgame.dead_stones[1] == 3,"3 white stones should have died"
       
     #test sim_move function
     def test_sim_move(self):
@@ -154,7 +180,7 @@ class game_tests(class_tests):
         self.testgame = gologic.game(19)
         self.testmove = gologic.move((5,5),0)
         legality = self.testgame.make_a_move(self.testmove)
-        assert legality == True,"this move should be legal"
+        assert legality != False,"this move should be legal"
 
     #test make_a_move function
     def test_make_a_move2(self):
@@ -190,7 +216,35 @@ class game_tests(class_tests):
         self.testgame.groups.append(gologic.group((6,4),0,self.testgame.gameboard.grid))
         self.testmove = gologic.move((5,5),0)
         legality = self.testgame.make_a_move(self.testmove)
-        assert legality == True,"this move should be legal"     
+        assert legality != False,"this move should be legal" 
+        assert len(self.testgame.groups) == 7,"should be 7 groups after this move has been made"  
+        assert legality.dead_stones[1] == 1,"One white stone should have died"
+        
+    #test make_a_move function
+    def test_make_a_move4(self):
+        self.testgame = gologic.game(19)
+        self.testgame.gameboard.add_stone((3,4),0,10)
+        self.testgame.groups.append(gologic.group((3,4),0,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((3,5),0,10)
+        self.testgame.groups[0].add_position((3,5),self.testgame.gameboard.grid)
+        self.testgame.gameboard.add_stone((2,3),1,10)
+        self.testgame.groups.append(gologic.group((2,3),1,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((2,4),1,10)
+        self.testgame.groups[1].add_position((2,4),self.testgame.gameboard.grid)
+        self.testgame.gameboard.add_stone((2,5),1,10)
+        self.testgame.groups[1].add_position((2,5),self.testgame.gameboard.grid)
+        self.testgame.gameboard.add_stone((4,4),1,10)
+        self.testgame.groups.append(gologic.group((4,4),1,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((4,5),1,10)
+        self.testgame.groups[1].add_position((4,5),self.testgame.gameboard.grid)
+        self.testgame.gameboard.add_stone((3,6),1,10)
+        self.testgame.groups.append(gologic.group((3,6),1,self.testgame.gameboard.grid))
+        self.testmove = gologic.move((3,3),1)
+        legality = self.testgame.make_a_move(self.testmove)
+        assert legality != False,"this move should be legal"
+        assert len(legality.groups) == 3,"should be 3 groups after this move has been made"  
+        assert legality.dead_stones[0] == 2,"2 black stones should have died"
+
         
 #test my board class
 class board_tests(class_tests):

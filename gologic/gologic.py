@@ -20,8 +20,31 @@ def get_von_neumann(position):
     return [(x,y+1),(x,y-1),(x+1,y),(x-1,y)]
 
 
+"""Interface is highest level class.Contains game. Acts as interface to UI"""
+class interface():
+    def __init__(self):pass
+    
+    def newgame(self,size):
+        self.game = game(size)
+    
+    def pass_turn(self):
+        if self.game.player_turn == 0: self.game.player_turn = 1
+        else: self.game.player_turn = 0
+    
+    """Executive (highest) level function to make a move, can be called by UI"""
+    def try_move(self,position):
+        newmove = move(position,self.game.player_turn)
+        move_attempt = self.game.make_a_move(newmove)
+        if move_attempt != False:
+            self.game = move_attempt
+            self.pass_turn()
+            return True
+        else: return False
+
+
 class game():
     def __init__(self,size):
+        self.player_turn = 0
         self.order = 1
         self.dead_stones = [0,0]
         self.gameboard = board(size)
@@ -32,13 +55,14 @@ class game():
     There is a maximum of only four iterations and any irrelevant groups or positions in a group are not considered"""
     def check_for_group(self,move):
         for movepos in get_von_neumann(move.position): #iterate through von neumann neighbourhood of proposed stone placement position
-            if self.gameboard.grid[(movepos)] != None:
-                group = self.gameboard.grid[(movepos)].my_group
-                if group not in move.adjacent_groups and group not in move.adjacent_op_groups:
-                    if move.colour == group.colour:
-                        move.adjacent_groups.append(group)
-                    else:
-                        move.adjacent_op_groups.append(group)
+            if movepos in self.gameboard.grid:
+                if self.gameboard.grid[(movepos)] != None:
+                    group = self.gameboard.grid[(movepos)].my_group
+                    if group not in move.adjacent_groups and group not in move.adjacent_op_groups:
+                        if move.colour == group.colour:
+                            move.adjacent_groups.append(group)
+                        else:
+                            move.adjacent_op_groups.append(group)
     
     def merge_groups(self,groups): 
         first = True
@@ -85,10 +109,12 @@ class game():
             if group.doomed == True: 
                 sim_game.kill_group(group)
                 legal = True
-        if legal == True: return True
+        if legal == True: 
+            return sim_game
         sim_game.gameboard.grid[move.position].my_group.am_i_alive(sim_game.gameboard.grid)
         if sim_game.gameboard.grid[move.position].my_group.doomed == True: return False
-        return True
+        else:
+            return sim_game
     
 class move():
     def __init__(self,position,colour):
@@ -148,12 +174,5 @@ class group():
         self.positions.append(position)
         grid[position].my_group = self
 
-if __name__ == '__main__':
-    """
-    testboard = board(13)
-    testboard.grid[(1,0)]= stone(0,0)
-    testboard.grid[(0,1)]= stone(0,0)
-    testgroup = group((0,0),0)
-    print testgroup.am_i_alive(testboard.grid)
-    """
-    pass
+if __name__ == '__main__': pass
+    
