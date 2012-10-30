@@ -59,21 +59,45 @@ class game():
         self.groups.remove(group)
         self.dead_stones[group.colour] = self.dead_stones[group.colour] + score
     
-    """High lvl function to make a move. First the move is simulated on a copy of the game"""
-    def make_a_move(self,move):
+    """Function to simulate a stone placement on a copy of the board and return the copy for analysis
+    to determine whether move was legal or not
+    def sim_move(self,move):
         sim_game = copy.deepcopy(self)
+        sim_game.gameboard.add_stone(move.position,move.colour,sim_game.order)
         sim_game.check_for_group(move)
         if len(move.adjacent_groups) > 0:
             sim_game.merge_groups(move.adjacent_groups)
-            #sim_game.groups[move]
-                
+            #sim_game.groups[move]        
         else: 
-            sim_game.groups.append(group(move.position,move.colour))
+            sim_game.groups.append(group(move.position,move.colour,sim_game.gameboard.grid))
             
-        sim_game.gameboard.add_stone(move.position,move.colour,sim_game.order)
         sim_game.order = sim_game.order + 1
-        for group in sim_game.groups: group.am_i_alive(sim_game.gameboard.grid)
-    
+        for igroup in sim_game.groups:
+            if igroup.am_i_alive(sim_game.gameboard.grid) == False:
+                 igroup.doomed = True
+        return sim_game
+    """
+
+    """Function to simulate a stone placement on a copy of the board and return the copy for analysis
+    to determine whether move was legal or not"""
+    def sim_move(self,move):
+        sim_game = copy.deepcopy(self)
+        sim_game.gameboard.add_stone(move.position,move.colour,sim_game.order)
+        sim_game.check_for_group(move)
+        if len(move.adjacent_groups) > 0:
+            move.adjacent_groups[0].add_position(move.position,sim_game.gameboard.grid)
+            if len(move.adjacent_groups) > 1:
+                sim_game.merge_groups(move.adjacent_groups)
+        else: 
+            sim_game.groups.append(group(move.position,move.colour,sim_game.gameboard.grid))
+        return sim_game
+           
+    """High lvl function to make a move. First the move is simulated on a copy of the game"""
+    def make_a_move(self,move):
+        sim_game = self.sim_move(move)
+        for group in sim_game.groups:pass
+
+
     
 class move():
     def __init__(self,position,colour):
@@ -113,6 +137,7 @@ class stone():
 class group():
     def __init__(self,position,colour,grid):
         self.colour = colour
+        self.doomed = False
         self.positions = [position]
         grid[position].my_group = self
      

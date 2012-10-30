@@ -125,13 +125,29 @@ class game_tests(class_tests):
         for position, value in self.testgame.gameboard.grid.items():
             assert value == None,"Board should be empty"
       
-    #test make a move function
-    def test_make_a_move(self):
+    #test sim_move function
+    def test_sim_move(self):
         self.testgame = gologic.game(19)
         self.testmove = gologic.move((5,5),0)
-        #self.testgame.make_a_move(self.testmove)
-        #assert len(self.testgame.groups) == 1,"There should be 1 group"
-        #assert self.testgame.gameboard.grid == 1,"There should be 1 group"
+        sim_game = self.testgame.sim_move(self.testmove)
+        assert len(sim_game.groups) == 1,"There should be 1 group"
+        assert len(sim_game.groups[0].positions) == 1,"There should be 1 position in the group"
+        
+    #test sim_move function
+    def test_sim_move2(self):
+        self.testgame = gologic.game(19)
+        self.testgame.gameboard.add_stone((4,5),0,15)
+        self.testgame.groups.append(gologic.group((4,5),0,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((6,5),0,15)
+        self.testgame.groups.append(gologic.group((6,5),0,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((5,6),0,15)
+        self.testgame.groups.append(gologic.group((5,6),0,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((5,4),0,15)
+        self.testgame.groups.append(gologic.group((5,4),0,self.testgame.gameboard.grid))
+        self.testmove = gologic.move((5,5),0)
+        sim_game = self.testgame.sim_move(self.testmove)
+        assert len(sim_game.groups) == 1,"There should be 1 group"
+        assert len(sim_game.groups[0].positions) == 5,"There should be 5 positions in the group"
         
         
 #test my board class
