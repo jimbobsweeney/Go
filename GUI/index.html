@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<script src="jquery.js"></script>
+	<script src="jcanvas.min.js"></script>
+	
+		<title>HTML5 Go Board</title>
+</head>
+<body>
+	<canvas id="myCanvas" width="720" height="720" style="border:1px solid #000000;"></canvas>
+	
+	<script>
+	//setup canvas
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	ctx.font="30px Arial";
+	
+	//draw text
+	ctx.strokeText("GO", 720/2, 720/2);
+	
+	//add image to canvas
+	var white = new Image();
+	white.onload = function(){
+		
+	ctx.drawImage(white, 20, 20, 35, 35);
+	};
+	
+	
+	white.src = ("w30.png");
+	
+	
+	//start drag and drop implementation
+	function boardOnClick(e){
+		var cell = getCursorPosition(e);
+		
+		for (var i = 0; i < numPieces; i++){
+			if((pieces[i].row == cell.row) &&
+			(pieces[i].column == cell.column)) {
+			clickOnPiece(i);
+			return;
+			}
+		}
+		clickOnEmptyCell(cell);
+	}
+	
+	//draw piece
+	function drawPiece(){
+		ctx.drawImage(white, 40,40)
+	}
+	
+	function drawBoard(){
+		
+		for( var lines=0; lines < 18; lines++){
+			var x = lines * (720 /18)
+			ctx.moveTo(x,0);
+			ctx.lineTo(x,720);
+		}	
+				
+		for (var line_y=0; line_y < 18; line_y++){
+			var y = line_y * (720/18)
+			var y = line_y * (720/18)
+			ctx.moveTo(0,y);
+			ctx.lineTo(720,y);
+		}	
+		ctx.strokeStyle="black";
+		ctx.stroke();
+	}
+	
+	//pos start points on board
+	function drawStarPoints(){
+		for(i=3; i<18; i += 6){
+			var x = i * 40
+			for(j=3; j<18; j +=6){
+				var y = j * 40
+				
+				ctx.beginPath();
+				ctx.arc(x, y, 5, 0, 2*Math.PI);
+				ctx.fillStyle = 'black';
+				ctx.fill();
+				ctx.stroke();
+			}
+		}	
+	}
+	
+	//add in onclick events and link them to these functions
+	function whiteFade(){
+	
+	}
+	
+	function whiteFull(){
+	}
+	
+	
+	
+	drawStarPoints();
+	drawBoard();
+
+	</script>
+</body>
+</html>
