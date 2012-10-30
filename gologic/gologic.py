@@ -60,25 +60,6 @@ class game():
         self.dead_stones[group.colour] = self.dead_stones[group.colour] + score
     
     """Function to simulate a stone placement on a copy of the board and return the copy for analysis
-    to determine whether move was legal or not
-    def sim_move(self,move):
-        sim_game = copy.deepcopy(self)
-        sim_game.gameboard.add_stone(move.position,move.colour,sim_game.order)
-        sim_game.check_for_group(move)
-        if len(move.adjacent_groups) > 0:
-            sim_game.merge_groups(move.adjacent_groups)
-            #sim_game.groups[move]        
-        else: 
-            sim_game.groups.append(group(move.position,move.colour,sim_game.gameboard.grid))
-            
-        sim_game.order = sim_game.order + 1
-        for igroup in sim_game.groups:
-            if igroup.am_i_alive(sim_game.gameboard.grid) == False:
-                 igroup.doomed = True
-        return sim_game
-    """
-
-    """Function to simulate a stone placement on a copy of the board and return the copy for analysis
     to determine whether move was legal or not"""
     def sim_move(self,move):
         sim_game = copy.deepcopy(self)
@@ -90,14 +71,24 @@ class game():
                 sim_game.merge_groups(move.adjacent_groups)
         else: 
             sim_game.groups.append(group(move.position,move.colour,sim_game.gameboard.grid))
+        sim_game.order = sim_game.order + 1
         return sim_game
            
-    """High lvl function to make a move. First the move is simulated on a copy of the game"""
+    """High lvl function to make a move. First the move is simulated on a copy of the game
+    then it checks whether move has resulted in opponents group death, if not then it checks
+    if move has resulted in own groups death, if that is the case move is illegal"""
     def make_a_move(self,move):
+        legal = False
         sim_game = self.sim_move(move)
-        for group in sim_game.groups:pass
-
-
+        for group in move.adjacent_op_groups:
+            group.am_i_alive(sim_game.gameboard.grid)
+            if group.doomed == True: 
+                sim_game.kill_group(group)
+                legal = True
+        if legal == True: return True
+        sim_game.gameboard.grid[move.position].my_group.am_i_alive(sim_game.gameboard.grid)
+        if sim_game.gameboard.grid[move.position].my_group.doomed == True: return False
+        return True
     
 class move():
     def __init__(self,position,colour):
@@ -150,6 +141,7 @@ class group():
                 if vn_position in grid: #check if neighbour cell is actually on board
                         if grid[vn_position] == None:
                             return True
+        self.doomed = True                
         return False
 
     def add_position(self,position,grid):

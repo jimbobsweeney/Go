@@ -149,6 +149,48 @@ class game_tests(class_tests):
         assert len(sim_game.groups) == 1,"There should be 1 group"
         assert len(sim_game.groups[0].positions) == 5,"There should be 5 positions in the group"
         
+    #test make_a_move function
+    def test_make_a_move(self):
+        self.testgame = gologic.game(19)
+        self.testmove = gologic.move((5,5),0)
+        legality = self.testgame.make_a_move(self.testmove)
+        assert legality == True,"this move should be legal"
+
+    #test make_a_move function
+    def test_make_a_move2(self):
+        self.testgame = gologic.game(19)
+        self.testgame.gameboard.add_stone((4,5),1,15)
+        self.testgame.groups.append(gologic.group((4,5),1,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((6,5),1,15)
+        self.testgame.groups.append(gologic.group((6,5),1,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((5,6),1,15)
+        self.testgame.groups.append(gologic.group((5,6),1,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((5,4),1,15)
+        self.testgame.groups.append(gologic.group((5,4),1,self.testgame.gameboard.grid))
+        self.testmove = gologic.move((5,5),0)
+        legality = self.testgame.make_a_move(self.testmove)
+        assert legality == False,"this move should be illegal"
+        
+   #test make_a_move function
+    def test_make_a_move3(self):
+        self.testgame = gologic.game(19)
+        self.testgame.gameboard.add_stone((4,5),1,15)
+        self.testgame.groups.append(gologic.group((4,5),1,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((6,5),1,15)
+        self.testgame.groups.append(gologic.group((6,5),1,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((5,6),1,15)
+        self.testgame.groups.append(gologic.group((5,6),1,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((5,4),1,15)
+        self.testgame.groups.append(gologic.group((5,4),1,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((4,4),0,15)
+        self.testgame.groups.append(gologic.group((4,4),0,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((5,3),0,15)
+        self.testgame.groups.append(gologic.group((5,3),0,self.testgame.gameboard.grid))
+        self.testgame.gameboard.add_stone((6,4),0,15)
+        self.testgame.groups.append(gologic.group((6,4),0,self.testgame.gameboard.grid))
+        self.testmove = gologic.move((5,5),0)
+        legality = self.testgame.make_a_move(self.testmove)
+        assert legality == True,"this move should be legal"     
         
 #test my board class
 class board_tests(class_tests):
