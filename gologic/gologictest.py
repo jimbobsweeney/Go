@@ -64,6 +64,100 @@ class interface_tests(class_tests):
         for group in test_interface.game.groups: assert group.colour == 0,"All groups should be black"
         assert len(test_interface.game.groups) == 7,"should be 7 groups now"
         
+    #play test game
+    def test_gameplay_multikill(self):
+        test_interface = gologic.interface()
+        test_interface.newgame(19)
+        test_interface.pass_turn()
+        test_interface.try_move((3,1))#white
+        test_interface.try_move((3,2))#black
+        test_interface.try_move((2,2))
+        test_interface.try_move((2,3))
+        test_interface.try_move((1,3))
+        test_interface.try_move((3,4))
+        test_interface.try_move((2,4))
+        test_interface.try_move((4,3))
+        test_interface.try_move((3,5))
+        test_interface.pass_turn()
+        test_interface.try_move((4,4))
+        test_interface.pass_turn()
+        test_interface.try_move((5,3))
+        test_interface.pass_turn()
+        test_interface.try_move((4,2))
+        test_interface.pass_turn()
+        assert len(test_interface.game.groups) == 12,"should be 12 groups now"
+        test_interface.try_move((3,3))
+        assert len(test_interface.game.groups) == 9,"should be 9 groups now"
+        assert test_interface.game.dead_stones[0] == 4,"should be 4 dead black stones"
+        for group in test_interface.game.groups: assert group.colour == 1,"All groups should be white"
+        test_interface.pass_turn()
+        test_interface.try_move((2,3))
+        assert len(test_interface.game.groups) == 6,"should be 6 groups now"
+        
+    #play test game
+    def test_gameplay_corner(self):
+        test_interface = gologic.interface()
+        test_interface.newgame(9)
+        test_interface.try_move((8,7))#black
+        test_interface.try_move((8,8))#white
+        test_interface.try_move((7,8))#black
+        for group in test_interface.game.groups: assert group.colour == 0,"All groups should be black"
+        assert len(test_interface.game.groups) == 2,"should be 2 groups now"
+        
+    #play test game
+    def test_gameplay_box(self):
+        test_interface = gologic.interface()
+        test_interface.newgame(9)
+        test_interface.try_move((2,2))#black
+        test_interface.try_move((3,3))#white
+        test_interface.try_move((2,3))#black
+        test_interface.try_move((3,4))#white
+        test_interface.try_move((2,4))#black
+        test_interface.try_move((3,5))#white
+        test_interface.try_move((2,5))#black
+        test_interface.try_move((4,5))#white
+        test_interface.try_move((2,6))#black
+        test_interface.try_move((5,5))#white
+        test_interface.try_move((3,6))#black
+        test_interface.try_move((5,4))#white
+        test_interface.try_move((4,6))#black
+        test_interface.try_move((5,3))#white
+        test_interface.try_move((5,6))#black
+        test_interface.try_move((4,3))#white
+        test_interface.try_move((6,6))#black
+        test_interface.pass_turn()
+        test_interface.try_move((6,5))#black
+        test_interface.pass_turn()
+        test_interface.try_move((6,4))#black
+        test_interface.pass_turn()
+        test_interface.try_move((6,3))#black
+        test_interface.pass_turn()
+        test_interface.try_move((6,2))#black
+        test_interface.pass_turn()
+        test_interface.try_move((5,2))#black
+        test_interface.pass_turn()
+        test_interface.try_move((4,2))#black
+        test_interface.pass_turn()
+        test_interface.try_move((3,2))#black
+        assert len(test_interface.game.groups) == 2,"should be 2 groups now"
+        test_interface.pass_turn()
+        test_interface.try_move((4,4))#black
+        assert test_interface.game.dead_stones[1] == 8,"should be 8 dead white stones"
+        assert len(test_interface.game.groups) == 2,"should be 2 group now"
+        for group in test_interface.game.groups: assert group.colour == 0,"All groups should be black"
+        assert len(test_interface.game.groups[0].positions) == 16,"Group should have 16 stones in it"
+        
+    #play test game
+    def test_illegal_move(self):
+        test_interface = gologic.interface()
+        test_interface.newgame(9)
+        test_interface.try_move((1,8))#black
+        test_interface.pass_turn()
+        test_interface.try_move((0,7))#black
+        legality = test_interface.try_move((0,8))#white
+        assert legality == False
+        
+        
 #test my game class
 class game_tests(class_tests):
     
