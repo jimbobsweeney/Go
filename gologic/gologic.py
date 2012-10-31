@@ -126,8 +126,7 @@ class move():
 """Board class contins 2d list of positions"""
 class board():
     def __init__(self,size):
-        if size < 2: 
-            raise bad_board_size_error,'Board size cannot be less than 2'
+        if size < 2: raise bad_board_size_error,'Board size cannot be less than 2'
         self.grid = {}
         for x in range(size):
             for y in range(size):
@@ -135,17 +134,14 @@ class board():
     
     """add stone to board"""
     def add_stone(self,position,colour,order):
-        if position not in self.grid:
-            raise position_xy_out_of_range_error,'position does not exist'
-        if self.grid[position] != None:
-            raise position_occupied_error,'position is already occupied by a stone'  
+        if position not in self.grid: raise position_xy_out_of_range_error,'position does not exist'
+        if self.grid[position] != None: raise position_occupied_error,'position is already occupied by a stone'  
         self.grid[position] = stone(colour,order)
 
 """ Stone class is very simple, just records colour and order placed"""  
 class stone():
     def __init__(self,colour,order):
-        if order < 0: 
-            raise bad_stone_order_error,'Stone order cannot be less than 0'
+        if order < 0: raise bad_stone_order_error,'Stone order cannot be less than 0'
         self.colour = colour
         self.order = order
         self.my_group = None

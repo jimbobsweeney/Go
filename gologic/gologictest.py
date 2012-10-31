@@ -33,9 +33,37 @@ class interface_tests(class_tests):
         test_interface.pass_turn()
         test_interface.try_move((3,0))
         assert len(test_interface.game.groups) == 3,"should be 3 groups now"
-        assert len(test_interface.game.groups) == 3,"should be 3 groups now"
-        
+        assert test_interface.game.dead_stones[1] == 2,"should be 2 dead white stones"
+        test_interface.pass_turn()
+        test_interface.try_move((2,1))
+        assert len(test_interface.game.groups) == 1,"should be 1 group now"
+        assert len(test_interface.game.groups[0].positions) == 7,"Group should have 7 stones in it"
      
+    #play test game
+    def test_gameplay_the_ladder(self):
+        test_interface = gologic.interface()
+        test_interface.newgame(13)
+        test_interface.try_move((4,3))#black
+        test_interface.try_move((3,3))#white
+        test_interface.try_move((4,2))
+        test_interface.pass_turn()
+        test_interface.try_move((3,4))
+        test_interface.pass_turn()
+        test_interface.try_move((2,3))
+        test_interface.try_move((3,2))
+        test_interface.try_move((3,1))
+        test_interface.try_move((2,2))
+        test_interface.try_move((1,2))
+        test_interface.try_move((2,1))
+        test_interface.try_move((2,0))
+        test_interface.try_move((1,1))
+        test_interface.try_move((0,1))
+        test_interface.try_move((1,0))
+        test_interface.try_move((0,0))
+        assert test_interface.game.dead_stones[1] == 6,"should be 6 dead white stones"
+        for group in test_interface.game.groups: assert group.colour == 0,"All groups should be black"
+        assert len(test_interface.game.groups) == 7,"should be 7 groups now"
+        
 #test my game class
 class game_tests(class_tests):
     
