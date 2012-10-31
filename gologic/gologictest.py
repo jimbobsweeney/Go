@@ -139,6 +139,7 @@ class interface_tests(class_tests):
         test_interface.try_move((4,2))#black
         test_interface.pass_turn()
         test_interface.try_move((3,2))#black
+        assert test_interface.try_move((4,4)) == False,"""White cannot move here"""
         assert len(test_interface.game.groups) == 2,"should be 2 groups now"
         test_interface.pass_turn()
         test_interface.try_move((4,4))#black
