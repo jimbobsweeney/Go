@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Canvas Tutorial</title>
+    </head>
+    <body>
+        
+		<script src="jquery.js"></script>
+		<script src="jquery-ui.js"></script>
+		<script src="jcanvas.min.js"></script>
+		<canvas id="board" width="600" height="600"></canvas> 
+        
+        <script>
+        var canvas = document.getElementById('board');
+        var context = canvas.getContext('2d');
+        
+        function Move(column, row, colour){
+        // constructor for a move object. Stores the colour and position of the tile placed
+        		this.position= [column,row];
+        		this.colour = colour; }
+        
+        function createHTTP(){
+        // constructs a new HTTP request object and returns it.
+        		var xmlhttp;
+				if (window.XMLHttpRequest)
+                {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+  				xmlhttp=new XMLHttpRequest();
+  				}
+			else
+  				{// code for IE6, IE5
+  					xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+ 				 }
+ 			return xmlhttp;
+        	}
+    
+        function fetchBoard(){
+        // fetches the layout of a board from the server.
+        
+       	 		var request = createHTTP()
+        		// open new request
+       	 		request.open("GET", "file:///C:/Users/Compaq/Documents/Web%20&%20UI/ws/htdocs/Go%UI%concepts/manydata.txt", false);
+        		request.send() // Send Request
+        		// set text from file to a new variable, then return it.
+        		jsondoc = request.responseText
+        		return jsondoc
+        		}
+                
+        function loadCanvas(canvas){
+        // Initialise variables to alter canvas.
+
+            context.beginPath()
+            
+            //bounding rectangle and gradient
+            context.rect(0,0, 570,570)
+            var gradient = context.createLinearGradient(0,0,570,570)
+            gradient.addColorStop(0, '#993300');
+            gradient.addColorStop(1, '#FFFF00');
+      		context.fillStyle = gradient;
+      		context.fill();
+            //vertical lines
+            for (var i = 0; i<19; i++)
+            {
+                
+                context.moveTo((i*30)+15,15);
+                context.lineTo((i*30)+15,555);
+                context.strokeStyle = 'black';
+
+            }
+            //horizontal lines
+            for (var j = 0; j<19; j++)
+            {
+
+                context.moveTo(15,(j*30)+15);
+                context.lineTo(555,(j*30)+15);
+ 				context.strokeStyle = 'black';
+            }
+            context.stroke();
+            // Star points
+            for (var i=90; i <= 570; i+=180) {
+            	for (var j=90; j <= 570; j+=180)
+            	{
+            		context.beginPath()
+            		context.arc(i+15, j+15, 5, 0, 2 * Math.PI, false);
+            		context.fillStyle = 'black'
+            		context.fill();
+            		context.stroke();  
+            	};
+            };
+          };
+            function drawPieces( ){
+            // draws the pieces on the screen.
+            var getJson = fetchBoard(); // fetch board from server.
+            var jsonObject = jQuery.parseJSON(getJson);
+            // Iterate over object from server
+            for (key in jsonObject){
+				var point = jsonObject[key].position;
+                var pieceColour = jsonObject[key].colour;
+                
+					$("canvas").drawArc(
+						{
+	  				fillStyle: pieceColour,
+	  				x: (point[0]*30)+15, y: (point[y]*30)+15,
+	  				radius: 15
+	  			});
+            } 
+            }
+
+            
+        $(document).ready(function(){   
+        loadCanvas(canvas);
+        player = 'black';
+        });
+        
+        $("canvas").click(function(event){
+        var point = getCursorPosition(event);
+
+        if ((point[0] >= 0 && point[0] <= 18) && (point[1] >= 0 && point[1] <= 18))
+        {
+        var move = new Move (point[0], point[1], player);
+        window.alert("This will make a POST request containing the point " + move.position + " and the colour " + move.colour)
+        }
+        });
+        function getCursorPosition(event){
+                var x = event.pageX - canvas.offsetLeft;
+                var y = event.pageY - canvas.offsetTop;
+                // cell width appears
+                var cellx = Math.floor(x/30);
+                var celly = Math.floor(y/30);
+           	
+           		return [cellx, celly]
+          }  
+        </script>
+        
+    </body>
+    
+</html>
+        
