@@ -20,7 +20,7 @@
         		this.position= [column,row];
         		this.colour = colour; }
         
-        function createHTTP(){
+        function createHttp(){
         // constructs a new HTTP request object and returns it.
         		var xmlhttp;
 				if (window.XMLHttpRequest)
@@ -38,13 +38,13 @@
         function fetchBoard(){
         // fetches the layout of a board from the server.
         
-       	 		var request = createHTTP()
+       	 		var request = createHttp()
         		// open new request
-       	 		request.open("GET", "file:///C:/Users/Compaq/Documents/Web%20&%20UI/ws/htdocs/Go%UI%concepts/manydata.txt", false);
+       	 		request.open("GET", "file:///C:/Path_to_location_of_file/manydata.txt", false);
         		request.send() // Send Request
         		// set text from file to a new variable, then return it.
-        		jsondoc = request.responseText
-        		return jsondoc
+        		jsonDoc = request.responseText
+        		return jsonDoc
         		}
                 
         function loadCanvas(canvas){
